@@ -20,8 +20,8 @@ threadsafe: yes
 
 handlers:
 
-- url: .*
-  script: api.app
+- url: /api/search.*
+  script: api.handlers
 
 libraries:
 - name: webapp2

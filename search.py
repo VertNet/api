@@ -6,7 +6,7 @@ from google.appengine.api import namespace_manager
 from google.appengine.api import search
 from google.appengine.api.search import SortOptions, SortExpression
 
-from . import SEARCH_VERSION
+SEARCH_VERSION = 'search.py 2016-05-10T18:23:21+CEST'
 
 
 def _get_rec(doc):

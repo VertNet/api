@@ -22,7 +22,8 @@ import webapp2
 
 import search as vnsearch
 import util as vnutil
-from . import API_VERSION
+
+API_VERSION = 'api.py 2016-05-10T18:23:51+CEST'
 
 
 class SearchApi(webapp2.RequestHandler):
@@ -38,6 +39,7 @@ class SearchApi(webapp2.RequestHandler):
     def get(self):
         logging.info('API search request: %s\nVersion: %s' % (self.request,
                                                               API_VERSION))
+        # TODO: Add clause to catch missing 'q' error
         request = json.loads(self.request.get('q'))
         q, c, limit = map(request.get, ['q', 'c', 'l'])
 
