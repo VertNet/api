@@ -5,7 +5,7 @@
 # Last change to dev branch: ?
 #
 # DEPLOYMENT INFO
-# Last deployed dev version: 2016-05-10T18:54:13+CEST
+# Last deployed dev version: 2016-05-10T19:24:26+CEST
 # Last deployed prod version: ?
 # command: gcloud preview app deploy api.yaml
 # args:
@@ -28,3 +28,6 @@ libraries:
   version: "2.5.2"
 # - name: jinja2
 #   version: latest
+
+skip_files:
+- ^data$
