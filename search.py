@@ -44,8 +44,6 @@ def query(q, limit, index_name='dwc', sort=None, curs=search.Cursor()):
             return [], None, 0, SEARCH_VERSION
 
     expressions = []
-    # [SortExpression(expression='rank', default_value=0,
-    #     direction=SortExpression.DESCENDING)]
 
     if sort:
         expressions.append(SortExpression(expression=sort, default_value='z',
@@ -61,7 +59,7 @@ def query(q, limit, index_name='dwc', sort=None, curs=search.Cursor()):
             cursor=curs,
             sort_options=sort_options)
     else:
-        # Always use 10,000 as the value for number_found_accuracy.  Based on
+        # Always use 10,000 as the value for number_found_accuracy. Based on
         # extensive testing, using this maximum allowed value results in the
         # best count accuracy and incurs only a minor performance penalty.
         options = search.QueryOptions(
@@ -106,11 +104,13 @@ def query(q, limit, index_name='dwc', sort=None, curs=search.Cursor()):
     return [], None, 0, SEARCH_VERSION
 
 
-def query_rec_counter(q, limit, index_name='dwc', sort=None, curs=search.Cursor()):
-    """ Makes a search from curs. Returns count of records in search, new cursor """
+def query_rec_counter(q, limit, index_name='dwc',
+                      sort=None, curs=search.Cursor()):
+    """ Makes a search from curs.
+Returns count of records in search, new cursor """
     if not curs:
         curs = search.Cursor()
-    
+
     if q.startswith('id:'):
         did = q.split(':')[1].strip()
         namespace = namespace_manager.get_namespace()
@@ -120,8 +120,9 @@ def query_rec_counter(q, limit, index_name='dwc', sort=None, curs=search.Cursor(
             recs = len(results.results)
             return recs, None, SEARCH_VERSION
         else:
-#            logging.info('No results from search.Index() for namespace=%s index_name=%s \
-#                query=%s\nVersion: %s' % (namespace, index_name, q, SEARCH_VERSION))
+            logging.info('No results from search.Index() for namespace=%s'
+                         ' index_name=%s query=%s\nVersion: %s' %
+                         (namespace, index_name, q, SEARCH_VERSION))
             return 0, None, SEARCH_VERSION
 
     # Always use 10,000 as the value for number_found_accuracy.  Based on
@@ -136,26 +137,30 @@ def query_rec_counter(q, limit, index_name='dwc', sort=None, curs=search.Cursor(
 
     max_retries = 2
     retry_count = 0
-    error = None
+    # error = None
     while retry_count < max_retries:
         try:
             query = search.Query(query_string=q, options=options)
             namespace = namespace_manager.get_namespace()
-            results = search.Index(name=index_name, namespace=namespace).search(query)
+            results = search.Index(
+                name=index_name,
+                namespace=namespace
+            ).search(query)
             if results:
                 recs = len(results.results)
                 return recs, results.cursor, SEARCH_VERSION
             else:
                 logging.info('No results from query %s for namespace=%s \
-                    index_name=%s\nVersion: %s' % (q, namespace, index_name, 
-                    SEARCH_VERSION))
+                    index_name=%s\nVersion: %s' % (q, namespace, index_name,
+                                                   SEARCH_VERSION))
                 return 0, None, SEARCH_VERSION
         except Exception, e:
-            logging.error('Search failed.\nQUERY:\n %s\nERROR:\n%s\nVersion: %s' 
-                % (q,e,SEARCH_VERSION) )
-            error = e
+            logging.error('Search failed.\nQUERY:\n %s\nERROR:\n%s\n'
+                          'Version: %s' %
+                          (q, e, SEARCH_VERSION))
+            # error = e
             retry_count += 1
     logging.info('Finally no results from query %s for namespace=%s \
-        index_name=%s\nVersion: %s' % (q, namespace, index_name, 
-        SEARCH_VERSION))
+        index_name=%s\nVersion: %s' % (q, namespace, index_name,
+                                       SEARCH_VERSION))
     return 0, None, SEARCH_VERSION
