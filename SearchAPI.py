@@ -20,15 +20,16 @@ from datetime import datetime
 from google.appengine.api import search, taskqueue
 import webapp2
 
-from . import API_VERSION
+import search as vnsearch
 import util as vnutil
+from . import API_VERSION
 
 
 class SearchApi(webapp2.RequestHandler):
     def __init__(self, request, response):
         self.cityLatLong = request.headers.get('X-AppEngine-CityLatLong')
-#        logging.info('Init Request headers: %s\nVersion: %s'
-#            % (request.headers, API_VERSION) )
+        logging.info('Init Request headers: %s\nVersion: %s' %
+                     (request.headers, API_VERSION))
         self.initialize(request, response)
 
     def post(self):
