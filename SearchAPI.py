@@ -107,11 +107,13 @@ class SearchApi(webapp2.RequestHandler):
                 response_records=len(recs), res_counts=json.dumps(res_counts),
                 type=type
             )
-            taskqueue.add(
-                url='/apitracker',
-                params=params,
-                queue_name="apitracker"
-            )
+
+            # TODO: Implement apitracker
+            # taskqueue.add(
+            #     url='/apitracker',
+            #     params=params,
+            #     queue_name="apitracker"
+            # )
         else:
             error = result[0].__class__.__name__
             params = dict(
@@ -120,11 +122,11 @@ class SearchApi(webapp2.RequestHandler):
                 type='query',
                 latlon=self.cityLatLong
             )
-            taskqueue.add(
-                url='/apitracker',
-                params=params,
-                queue_name="apitracker"
-            )
+            # taskqueue.add(
+            #     url='/apitracker',
+            #     params=params,
+            #     queue_name="apitracker"
+            # )
             self.response.clear()
             message = 'Please try again. Error: %s' % error
             self.response.set_status(500, message=message)
