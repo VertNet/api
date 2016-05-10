@@ -1,0 +1,30 @@
+# CODEBASE INFO
+# Last pushed to master branch: ?
+# Last change to master branch: ?
+# Last pushed to dev branch: ?
+# Last change to master branch: ?
+#
+# DEPLOYMENT INFO
+# Last deployed dev version: ?
+# Last deployed prod version: ?
+# command: gcloud preview app deploy api.yaml
+# args:
+#   --project vertnet-portal  # Optional, no need if gcloud is configured to use this project
+#   --version prod|dev  # Indicates version to use. If 'Prod', --promote flag should be used
+#   --promote  # Optional, removes the version id from the deployment URL. Skip for testing and/or dev version
+
+module: api
+runtime: python27
+api_version: 1
+threadsafe: yes
+
+handlers:
+
+- url: .*
+  script: api.app
+
+libraries:
+- name: webapp2
+  version: "2.5.2"
+# - name: jinja2
+#   version: latest
