@@ -74,65 +74,6 @@ def acl_update_request():
     return mbody
 
 
-
-
-class CountHandler(webapp2.RequestHandler):
-    def post(self):
-        q = json.loads(self.request.get('q'))
-        latlon = self.request.get('latlon')
-        requesttime = self.request.get('requesttime')
-        reccount = int(self.request.get('reccount'))
-        fromapi=self.request.get('fromapi')
-        source=self.request.get('source')
-        cursor = self.request.get('cursor')
-        email = self.request.get('email')
-
-        if cursor:
-            curs = search.Cursor(web_safe_string=cursor)
-        else:
-            curs = None
-
-        records, next_cursor, query_version = \
-            vnsearch.query_rec_counter(q, OPTIMUM_CHUNK_SIZE, curs=curs)
-
-        # Update the total number of records retrieved
-        reccount = reccount+records
-
-        if next_cursor:
-            curs = next_cursor.web_safe_string
-        else:
-            curs = ''
-
-        if curs:
-            countparams=dict(q=self.request.get('q'), cursor=curs, reccount=reccount, 
-                requesttime=requesttime, fromapi=fromapi, source=source, latlon=latlon,
-                email=email)
-
-            logging.info('Record counter. Count: %s Email: %s Query: %s Cursor: %s\
-Version: %s' % (reccount, q, next_cursor, DOWNLOAD_VERSION) )
-            # Keep counting
-            taskqueue.add(url='/service/download/count', params=countparams,
-                queue_name="count")
-
-        else:
-            # Finished counting. Log the results and send email.
-            logging.info('Finished counting. Record total: %s Email: %s Query %s \
-Cursor: %s\nVersion: %s' % (reccount, email, q, next_cursor, DOWNLOAD_VERSION) )
-
-            apitracker_params = dict(
-                api_version=fromapi, count=reccount, query=q, latlon=latlon,
-                query_version=query_version, request_source=source, type='count',
-                downloader=email)
-
-            taskqueue.add(url='/apitracker', params=apitracker_params, 
-                queue_name="apitracker")
-
-            resulttime=datetime.utcnow().isoformat()
-            mail.send_mail(sender="VertNet Counts <vertnetinfo@vertnet.org>", 
-                to=email, subject="Your VertNet count is ready!",
-                body="""Your query found %s matching records.\nQuery: %s
-Request submitted: %s\nRequest fulfilled: %s""" % (reccount, q, requesttime, resulttime) )
-
 class WriteHandler(webapp2.RequestHandler):
     def post(self):
         q, email, name, latlon = map(self.request.get, ['q', 'email', 'name', 'latlon'])

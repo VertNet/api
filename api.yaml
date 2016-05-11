@@ -12,7 +12,11 @@
 #   --project vertnet-portal  # Optional, no need if gcloud is configured to use this project
 #   --version prod|dev  # Indicates version to use. If 'Prod', --promote flag should be used
 #   --promote  # Optional, removes the version id from the deployment URL. Skip for testing and/or dev version
-
+#
+# TODO:
+#   - DownloadApi: turn self.redirect to urlfetch and return output as JSON
+#   - DownloadHandler: make handler return JSON with result
+  
 module: api-module
 runtime: python27
 api_version: 1

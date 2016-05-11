@@ -21,13 +21,13 @@ import logging
 from datetime import datetime
 
 from google.appengine.api import taskqueue
-import cloudstorage as gcs
+# import cloudstorage as gcs
 import webapp2
 
-import search as vnsearch
-import util as vnutil
-from config import DOWNLOAD_VERSION, SEARCH_CHUNK_SIZE, DOWNLOAD_BUCKET, \
-                   FILE_EXTENSION
+# import search as vnsearch
+# import util as vnutil
+from config import DOWNLOAD_VERSION, SEARCH_CHUNK_SIZE
+# from config import DOWNLOAD_BUCKET, FILE_EXTENSION
 
 
 class DownloadHandler(webapp2.RequestHandler):
@@ -50,12 +50,18 @@ class DownloadHandler(webapp2.RequestHandler):
 
         if countonly is not None and len(countonly) > 0:
             logging.info("Just counts requested")
-            taskqueue.add(url='/service/download/count', params=params,
-                          queue_name="count")
+            taskqueue.add(
+                url='/service/download/count',
+                params=params,
+                # queue_name="count"
+            )
         else:
             logging.info("Full download requested")
-            taskqueue.add(url='/service/download/write', params=params,
-                          queue_name="downloadwrite")
+            taskqueue.add(
+                url='/service/download/write',
+                params=params,
+                # queue_name="downloadwrite"
+            )
 
     def post(self):
         self.get()
@@ -109,7 +115,7 @@ Keywords: %s Email: %s Name: %s LatLon: %s\nVersion: %s'
             if email is None or len(email) == 0:
                 return
 
-# NOT GOING TO HAPPEN ANYMORE. ALL DOWNLOADS WILL COME FROM API
+# # NOT GOING TO HAPPEN ANYMORE. ALL DOWNLOADS WILL COME FROM API
 #         else:
 #             logging.info('Portal download request. API: %s Source: %s \
 # Count: %s Keywords: %s Email: %s Name: %s LatLon: %s\nVersion: %s'
@@ -121,57 +127,57 @@ Keywords: %s Email: %s Name: %s LatLon: %s\nVersion: %s'
             # compose a file for download
             self._queue(q, email, name, latlon, fromapi, source, countonly)
 
-# WITH API DOWNLOADS, THIS 'else' WILL NEVER HAPPEN
-        else:
-            # The results are smaller than SEARCH_CHUNK_SIZE,
-            # download directly and make
-            # a copy of the file in the download bucket
-            filename = str('%s.txt' % name)
-            self.response.headers['Content-Type'] = "text/tab-separated-values"
-            self.response.headers['Content-Disposition'] = \
-                "attachment; filename=%s" % filename
-            records, cursor, count, query_version = vnsearch.query(q, count)
+# # WITH API DOWNLOADS, THIS 'else' WILL NEVER HAPPEN. REMOVE AFTER TESTING
+#         else:
+#             # The results are smaller than SEARCH_CHUNK_SIZE,
+#             # download directly and make
+#             # a copy of the file in the download bucket
+#             filename = str('%s.txt' % name)
+#             self.response.headers['Content-Type'] = "text/tab-separated-values"
+#             self.response.headers['Content-Disposition'] = \
+#                 "attachment; filename=%s" % filename
+#             records, cursor, count, query_version = vnsearch.query(q, count)
 
-            # Build dictionary for search counts
-            res_counts = vnutil.search_resource_counts(records)
+#             # Build dictionary for search counts
+#             res_counts = vnutil.search_resource_counts(records)
 
-            # Write the header for the output file
-            data = '%s\n%s' % (vnutil.download_header(),
-                               vnutil._get_tsv_chunk(records))
-            self.response.out.write(data)
+#             # Write the header for the output file
+#             data = '%s\n%s' % (vnutil.download_header(),
+#                                vnutil._get_tsv_chunk(records))
+#             self.response.out.write(data)
 
-            # Write single chunk to file in DOWNLOAD_BUCKET
-            filepattern = '%s-%s' % (name, uuid.uuid4().hex)
-            filename = '/%s/%s.%s' % (DOWNLOAD_BUCKET, filepattern,
-                                      FILE_EXTENSION)
+#             # Write single chunk to file in DOWNLOAD_BUCKET
+#             filepattern = '%s-%s' % (name, uuid.uuid4().hex)
+#             filename = '/%s/%s.%s' % (DOWNLOAD_BUCKET, filepattern,
+#                                       FILE_EXTENSION)
 
-            # Parameters for the coming apitracker taskqueue
-            apitracker_params = dict(
-                api_version=fromapi, count=len(records), download=filename,
-                downloader=email, error=None, latlon=latlon,
-                matching_records=len(records), query=q,
-                query_version=query_version, request_source=source,
-                response_records=len(records),
-                res_counts=json.dumps(res_counts), type='download')
+#             # Parameters for the coming apitracker taskqueue
+#             apitracker_params = dict(
+#                 api_version=fromapi, count=len(records), download=filename,
+#                 downloader=email, error=None, latlon=latlon,
+#                 matching_records=len(records), query=q,
+#                 query_version=query_version, request_source=source,
+#                 response_records=len(records),
+#                 res_counts=json.dumps(res_counts), type='download')
 
-            max_retries = 2
-            retry_count = 0
-            success = False
-            while not success and retry_count < max_retries:
-                try:
-                    with gcs.open(filename, 'w',
-                                  content_type='text/tab-separated-values',
-                                  options={'x-goog-acl': 'public-read'}) as f:
-                        f.write(data)
-                        success = True
-#                        logging.info('Sending small res_counts to tracker: %s'
-#                            % res_counts )
-                        taskqueue.add(url='/apitracker',
-                                      params=apitracker_params,
-                                      queue_name="apitracker")
-                except Exception, e:
-                    logging.error(
-                        "Error writing small result set to %s.\nError: %s \n\
-                         Version: %s" % (filename, e, DOWNLOAD_VERSION))
-                    retry_count += 1
-#                    raise e
+#             max_retries = 2
+#             retry_count = 0
+#             success = False
+#             while not success and retry_count < max_retries:
+#                 try:
+#                     with gcs.open(filename, 'w',
+#                                   content_type='text/tab-separated-values',
+#                                   options={'x-goog-acl': 'public-read'}) as f:
+#                         f.write(data)
+#                         success = True
+# #                        logging.info('Sending small res_counts to tracker: %s'
+# #                            % res_counts )
+#                         taskqueue.add(url='/apitracker',
+#                                       params=apitracker_params,
+#                                       queue_name="apitracker")
+#                 except Exception, e:
+#                     logging.error(
+#                         "Error writing small result set to %s.\nError: %s \n\
+#                          Version: %s" % (filename, e, DOWNLOAD_VERSION))
+#                     retry_count += 1
+# #                    raise e
