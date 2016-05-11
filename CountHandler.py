@@ -61,7 +61,7 @@ class CountHandler(webapp2.RequestHandler):
 
             logging.info('Record counter. Count: %s Email: %s Query: %s'
                          ' Cursor: %s Version: %s' %
-                         (reccount, q, next_cursor, DOWNLOAD_VERSION))
+                         (reccount, email, q, next_cursor, DOWNLOAD_VERSION))
             # Keep counting
             taskqueue.add(
                 url='/service/download/count',
