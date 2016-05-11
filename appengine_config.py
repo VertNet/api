@@ -14,8 +14,10 @@
 # along with VertNet.  If not, see: http://www.gnu.org/licenses
 
 import os
+import sys
 
 IS_DEV = os.environ.get('SERVER_SOFTWARE', '').startswith('Development')
+sys.path.append(os.path.join(os.path.dirname(__file__), 'lib'))
 
 
 # Set the namespace. If we're running in the devlopment environment, use

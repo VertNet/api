@@ -24,48 +24,23 @@
 import webapp2
 
 from SearchAPI import SearchApi
+from DownloadAPI import DownloadApi
+
+from DownloadHandler import DownloadHandler
+# from WriteHandler import WriteHandler
+# from ComposeHandler import ComposeHandler
+# from CountHandler import CountHandler
+# from CleanupHandler import CleanupHandler
 
 VERSION = '2016-05-10T18:06:45+CEST'
 
-# class DownloadApi(webapp2.RequestHandler):
-#     """Example download request:
-#         http://api.vertnet-portal.appspot.com/api/download?q= \
-#         {"q":"mappable:1 institutioncode:kstc","n":"kstctestresults.txt", \
-#         "e":"you@gmail.com"}
-#         Example count request:
-#         http://api.vertnet-portal.appspot.com/api/download?q= \
-#         {"q":"mappable:1 institutioncode:kstc","n":"kstctestresults.txt", \
-#         "e":"you@gmail.com", "c":"True"}
-#     """
-#     def __init__(self, request, response):
-#         self.cityLatLong = request.headers.get('X-AppEngine-CityLatLong')
-#         self.initialize(request, response)
-
-#     def post(self):
-#         self.get()
-
-#     def get(self):
-#         # Receive the download request and redirect it to the download service URL
-# #        logging.info('Version: %s\nAPI download request: %s' 
-# #            % (API_VERSION, self.request) )
-#         request = json.loads(self.request.get('q'))
-#         q, e, n, countonly = map(request.get, ['q', 'e', 'n', 'c'])
-#         keywords = q.split()
-#         if countonly is not None:
-#             params = urllib.urlencode(dict(keywords=json.dumps(keywords), count=0,
-#                 email=e, countonly=True, api=API_VERSION))
-#         else:
-#             params = urllib.urlencode(dict(keywords=json.dumps(keywords), count=0, 
-#                 email=e, name=n, api=API_VERSION))
-#         url = '/service/download?%s' % params
-#         self.redirect(url)
 
 # class FeedbackApi(webapp2.RequestHandler):
 #     def post(self):
 #         self.get()
 
 #     def get(self):
-# #        logging.info('API feedback request: %s\nVersion: %s' 
+# #        logging.info('API feedback request: %s\nVersion: %s'
 # #            % (self.request, API_VERSION) )
 #         request = json.loads(self.request.get('q'))
 #         url = '/api/github/issue/create?q=%s' % request
@@ -73,8 +48,14 @@ VERSION = '2016-05-10T18:06:45+CEST'
 
 routes = [
     webapp2.Route(r'/api/search', handler=SearchApi),
-    # webapp2.Route(r'/api/download', handler=DownloadApi),
-    # webapp2.Route(r'/api/feedback', handler=FeedbackApi)
+    webapp2.Route(r'/api/download', handler=DownloadApi),
+    # webapp2.Route(r'/api/feedback', handler=FeedbackApi),
+
+    webapp2.Route(r'/service/download', handler=DownloadHandler),
+    # webapp2.Route(r'/service/download/write', handler=WriteHandler),
+    # webapp2.Route(r'/service/download/compose', handler=ComposeHandler),
+    # webapp2.Route(r'/service/download/count', handler=CountHandler),
+    # webapp2.Route(r'/service/download/cleanup', handler=CleanupHandler),
 ]
 
 handlers = webapp2.WSGIApplication(routes, debug=True)

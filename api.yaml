@@ -1,6 +1,6 @@
 # CODEBASE INFO
-# Last pushed to master branch: ?
-# Last change to master branch: ?
+# Last pushed to master branch: 2016-05-10T19:37:15+CEST
+# Last change to master branch: Working 'search' method
 # Last pushed to dev branch: ?
 # Last change to dev branch: ?
 #
@@ -20,7 +20,9 @@ threadsafe: yes
 
 handlers:
 
-- url: /api/search.*
+- url: /api/*.*
+  script: api.handlers
+- url: /service/*.*
   script: api.handlers
 
 libraries:
