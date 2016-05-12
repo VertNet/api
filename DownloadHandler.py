@@ -60,7 +60,7 @@ class DownloadHandler(webapp2.RequestHandler):
             taskqueue.add(
                 url='/service/download/write',
                 params=params,
-                # queue_name="downloadwrite"
+                queue_name="downloadwrite"
             )
 
     def post(self):

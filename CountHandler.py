@@ -21,7 +21,7 @@ from google.appengine.api import search, taskqueue, mail
 import webapp2
 
 import search as vnsearch
-from config import DOWNLOAD_VERSION, OPTIMUM_CHUNK_SIZE
+from config import OPTIMUM_CHUNK_SIZE, DOWNLOAD_VERSION
 
 
 class CountHandler(webapp2.RequestHandler):
@@ -40,10 +40,12 @@ class CountHandler(webapp2.RequestHandler):
         if cursor:
             curs = search.Cursor(web_safe_string=cursor)
         else:
-            curs = None
+            curs = ''
 
-        records, next_cursor, query_version = \
-            vnsearch.query_rec_counter(q, OPTIMUM_CHUNK_SIZE, curs=curs)
+        records, next_cursor, query_version = vnsearch.query_rec_counter(
+            q, OPTIMUM_CHUNK_SIZE, curs=curs
+        )
+        logging.info("Got %d records this round" % records)
 
         # Update the total number of records retrieved
         reccount = reccount+records
@@ -51,7 +53,7 @@ class CountHandler(webapp2.RequestHandler):
         if next_cursor:
             curs = next_cursor.web_safe_string
         else:
-            curs = ''
+            curs = None
 
         if curs:
             countparams = dict(
@@ -66,26 +68,26 @@ class CountHandler(webapp2.RequestHandler):
             taskqueue.add(
                 url='/service/download/count',
                 params=countparams,
-                # queue_name="count"
+                queue_name="count"
             )
 
         else:
             # Finished counting. Log the results and send email.
-            logging.info('Finished counting. Record total: %s Email: %s'
-                         ' Query %s Cursor: %s\nVersion: %s' %
-                         (reccount, email, q, next_cursor, DOWNLOAD_VERSION))
+            # logging.info('Finished counting. Record total: %s Email: %s'
+            #              ' Query %s Cursor: %s\nVersion: %s' %
+            #              (reccount, email, q, next_cursor, DOWNLOAD_VERSION))
 
-            apitracker_params = dict(
-                api_version=fromapi, count=reccount, query=q, latlon=latlon,
-                query_version=query_version, request_source=source,
-                type='count', downloader=email
-            )
-
-            taskqueue.add(
-                url='/apitracker',
-                params=apitracker_params,
-                # queue_name="apitracker"
-            )
+            # apitracker_params = dict(
+            #     api_version=fromapi, count=reccount, query=q, latlon=latlon,
+            #     query_version=query_version, request_source=source,
+            #     type='count', downloader=email
+            # )
+            #
+            # taskqueue.add(
+            #     url='/apitracker',
+            #     params=apitracker_params,
+            #     queue_name="apitracker"
+            # )
 
             resulttime = datetime.utcnow().isoformat()
             mail.send_mail(
@@ -97,3 +99,5 @@ Query: %s
 Request submitted: %s
 Request fulfilled: %s
 """ % (reccount, q, requesttime, resulttime))
+
+            logging.info("Successfully sent mail to user")
