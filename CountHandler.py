@@ -68,7 +68,7 @@ class CountHandler(webapp2.RequestHandler):
             taskqueue.add(
                 url='/service/download/count',
                 params=countparams,
-                queue_name="count"
+                # queue_name="count"
             )
 
         else:
