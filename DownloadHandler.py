@@ -13,7 +13,11 @@
 # You should have received a copy of the GNU General Public License
 # along with VertNet.  If not, see: http://www.gnu.org/licenses
 
-"""Download service."""
+"""Download service.
+
+Get parameters from request
+Redirect to appropiate service: download or count
+"""
 
 import json
 import uuid

@@ -13,6 +13,13 @@
 # You should have received a copy of the GNU General Public License
 # along with VertNet.  If not, see: http://www.gnu.org/licenses
 
+"""Download service.
+
+Get parameters from request
+Get record count from vnsearch.query_rec_counter
+Send email to user with result
+"""
+
 import json
 import logging
 from datetime import datetime

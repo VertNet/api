@@ -13,6 +13,13 @@
 # You should have received a copy of the GNU General Public License
 # along with VertNet.  If not, see: http://www.gnu.org/licenses
 
+"""Search API.
+
+Get query parameters
+Get records from vnsearch.query
+Log in apitracker and return results
+"""
+
 import json
 import logging
 from datetime import datetime

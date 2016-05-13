@@ -15,7 +15,7 @@
 
 """Download service.
 
-Get location of file in temp GCS bucket
+Delete all temp chunks and files
 
 """
 
@@ -83,8 +83,10 @@ class CleanupHandler(webapp2.RequestHandler):
                         req.execute()
                         success = True
                     except Exception, e:
-                        logging.error("Error deleting chunk file %s attempt %s\nError: \
-%s\nVersion: %s" % (filename, retry_count+1, e, DOWNLOAD_VERSION))
+                        logging.error("Error deleting chunk file %s attempt %s"
+                                      "\nError: %s\nVersion: %s"
+                                      % (filename, retry_count+1, e,
+                                         DOWNLOAD_VERSION))
                         retry_count += 1
 #                        raise e
 
@@ -95,8 +97,8 @@ class CleanupHandler(webapp2.RequestHandler):
         try:
             req.execute()
         except Exception, e:
-            logging.error("Error deleting temporary composed file %s \nError: %s\n\
-Version: %s" % (filename, e, DOWNLOAD_VERSION))
+            logging.error("Error deleting temporary composed file %s \nError: "
+                          "%s\nVersion: %s" % (filename, e, DOWNLOAD_VERSION))
 
         logging.info('Finalized cleaning temporary files from /%s\nVersion: %s'
                      % (TEMP_BUCKET, DOWNLOAD_VERSION))

@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with VertNet.  If not, see: http://www.gnu.org/licenses
 
-UTIL_VERSION = 'util.py 2016-05-10T17:47:45+CEST'
+"""Common utilities."""
 
 ADD_TO_DOWNLOAD_RESULTS = ['url', 'gbifdatasetid', 'gbifpublisherid', 'email',
                            'contact', 'migrator', 'pubdate', 'lastindexed',

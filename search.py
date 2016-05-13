@@ -13,6 +13,12 @@
 # You should have received a copy of the GNU General Public License
 # along with VertNet.  If not, see: http://www.gnu.org/licenses
 
+"""Search services.
+
+query - search and return records
+query_rec_counter - search records and return count
+"""
+
 import json
 import logging
 
@@ -95,16 +101,17 @@ def query(q, limit, index_name='dwc', sort=None, curs=search.Cursor()):
             ).search(query)
             if results:
                 recs = map(_get_rec, results)
-                logging.info('Query: %s results from search.Index() for namespace=%s \
-                    index_name=%s query=%s\nVersion: %s' %
-                             (q, results.number_found, namespace,
-                              index_name, SEARCH_VERSION))
+                logging.info('Query: %s results from search.Index() for'
+                             ' namespace=%s index_name=%s query=%s\n'
+                             'Version: %s'
+                             % (q, results.number_found, namespace,
+                                index_name, SEARCH_VERSION))
                 return recs, results.cursor,\
                     results.number_found, SEARCH_VERSION
             else:
-                logging.info('No results from query %s for namespace=%s \
-                    index_name=%s\nVersion: %s' % (q, namespace, index_name,
-                                                   SEARCH_VERSION))
+                logging.info('No results from query %s for namespace=%s'
+                             ' index_name=%s\nVersion: %s'
+                             % (q, namespace, index_name, SEARCH_VERSION))
                 return [], None, 0, SEARCH_VERSION
         except Exception, e:
             logging.error('Search failed.\nQUERY:\n'
@@ -112,9 +119,9 @@ def query(q, limit, index_name='dwc', sort=None, curs=search.Cursor()):
                           % (q, e, SEARCH_VERSION))
             # error = e
             retry_count += 1
-    logging.info('Finally no results from query %s for namespace=%s \
-        index_name=%s\nVersion: %s' % (q, namespace, index_name,
-                                       SEARCH_VERSION))
+    logging.info('Finally no results from query %s for namespace=%s'
+                 ' index_name=%s\nVersion: %s'
+                 % (q, namespace, index_name, SEARCH_VERSION))
     return [], None, 0, SEARCH_VERSION
 
 
@@ -164,9 +171,9 @@ Returns count of records in search, new cursor """
                 recs = len(results.results)
                 return recs, results.cursor, SEARCH_VERSION
             else:
-                logging.info('No results from query %s for namespace=%s \
-                    index_name=%s\nVersion: %s' % (q, namespace, index_name,
-                                                   SEARCH_VERSION))
+                logging.info('No results from query %s for namespace=%s'
+                             'index_name=%s\nVersion: %s'
+                             % (q, namespace, index_name, SEARCH_VERSION))
                 return 0, None, SEARCH_VERSION
         except Exception, e:
             logging.error('Search failed.\nQUERY:\n %s\nERROR:\n%s\n'
@@ -174,7 +181,7 @@ Returns count of records in search, new cursor """
                           (q, e, SEARCH_VERSION))
             # error = e
             retry_count += 1
-    logging.info('Finally no results from query %s for namespace=%s \
-        index_name=%s\nVersion: %s' % (q, namespace, index_name,
-                                       SEARCH_VERSION))
+    logging.info('Finally no results from query %s for namespace=%s'
+                 'index_name=%s\nVersion: %s'
+                 % (q, namespace, index_name, SEARCH_VERSION))
     return 0, None, SEARCH_VERSION

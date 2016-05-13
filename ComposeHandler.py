@@ -15,8 +15,11 @@
 
 """Download service.
 
-Get location of file in temp GCS bucket
-
+Get location of temp chunk files in temp GCS bucket
+Merge all chunks into single large temp file
+Copy large temp file to final destination
+Send email to user with link to file
+Redirect to 'cleanup'
 """
 
 import logging

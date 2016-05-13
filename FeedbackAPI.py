@@ -13,6 +13,11 @@
 # You should have received a copy of the GNU General Public License
 # along with VertNet.  If not, see: http://www.gnu.org/licenses
 
+"""Feedback API.
+
+Create new issue based on data from the request
+"""
+
 import json
 
 import webapp2

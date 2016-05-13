@@ -1,8 +1,6 @@
 # CODEBASE INFO
-# Last pushed to master branch: 2016-05-13T12:20:53+CEST
-# Last change to master branch: Working API!
-# Last pushed to dev branch: 2016-05-13T12:21:49+CEST
-# Last change to dev branch: Working API!
+# Last pushed to master branch: 2016-05-13T12:49:46+CEST
+# Last change to master branch: Finished refurbishing api module
 #
 # DEPLOYMENT INFO
 # Last deployed dev version: 2016-05-13T12:17:55+CEST
@@ -14,6 +12,8 @@
 #   --promote  # Optional, removes the version id from the deployment URL. Skip for testing and/or dev version
 #
 # TODO:
+#   - *: Implement apitracker
+#   - *: Implement new method: count-and-return
 #   - DownloadApi: turn self.redirect to urlfetch and return output as JSON
 #   - DownloadHandler: make handler return JSON with result
 #   - DownloadHandler: if efficient count is implemented, activate direct download when count<=1K

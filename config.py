@@ -1,6 +1,25 @@
+# This file is part of VertNet: https://github.com/VertNet/webapp
+#
+# VertNet is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# VertNet is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with VertNet.  If not, see: http://www.gnu.org/licenses
+
+"""API methods configuration file.
+"""
+
 # Versions
-SEARCH_VERSION = 'search.py 2016-05-10T18:23:21+CEST'
-DOWNLOAD_VERSION = 'download.py 2016-05-11T11:20:03+CEST'
+SEARCH_VERSION = 'search.py 2016-05-13T12:38:30+CEST'
+DOWNLOAD_VERSION = 'download.py 2016-05-13T12:38:30+CEST'
+UTIL_VERSION = 'util.py 2016-05-13T12:38:30+CEST'
 
 # Download variables
 
