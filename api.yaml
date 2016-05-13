@@ -16,7 +16,8 @@
 # TODO:
 #   - DownloadApi: turn self.redirect to urlfetch and return output as JSON
 #   - DownloadHandler: make handler return JSON with result
-#   - CountHandler: look for ways of optimizing count retrieval
+#   - DownloadHandler: if efficient count is implemented, activate direct download when count<=1K
+#   - CountHandler: optimize count retrieval
 
 module: api-module
 runtime: python27

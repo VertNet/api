@@ -53,7 +53,7 @@ class DownloadHandler(webapp2.RequestHandler):
             taskqueue.add(
                 url='/service/download/count',
                 params=params,
-                queue_name="test"
+                queue_name="count"
             )
         else:
             logging.info("Full download requested")
@@ -128,6 +128,10 @@ Keywords: %s Email: %s Name: %s LatLon: %s\nVersion: %s'
             self._queue(q, email, name, latlon, fromapi, source, countonly)
 
 # # WITH API DOWNLOADS, THIS 'else' WILL NEVER HAPPEN. REMOVE AFTER TESTING
+#
+# # NOTE: This "could" happen if a more efficient 'count' method is implemented
+# # since that would allow for fast calculation of record counts and could
+# # redirect here if count <= 1K
 #         else:
 #             # The results are smaller than SEARCH_CHUNK_SIZE,
 #             # download directly and make

@@ -28,9 +28,8 @@ from DownloadAPI import DownloadApi
 
 from DownloadHandler import DownloadHandler
 from CountHandler import CountHandler
-# from WriteHandler import WriteHandler
+from WriteHandler import WriteHandler
 # from ComposeHandler import ComposeHandler
-
 # from CleanupHandler import CleanupHandler
 
 VERSION = '2016-05-10T18:06:45+CEST'
@@ -54,7 +53,7 @@ routes = [
 
     webapp2.Route(r'/service/download', handler=DownloadHandler),
     webapp2.Route(r'/service/download/count', handler=CountHandler),
-    # webapp2.Route(r'/service/download/write', handler=WriteHandler),
+    webapp2.Route(r'/service/download/write', handler=WriteHandler),
     # webapp2.Route(r'/service/download/compose', handler=ComposeHandler),
     # webapp2.Route(r'/service/download/cleanup', handler=CleanupHandler),
 ]
