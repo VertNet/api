@@ -13,12 +13,19 @@
 # You should have received a copy of the GNU General Public License
 # along with VertNet.  If not, see: http://www.gnu.org/licenses
 
-"""Download service."""
+"""Download service.
+
+Get chunk of records via vnsearch.search
+Count results and update any existing count
+Build TSV chunk and store in temp GCS bucket
+If more chunks to process, repeat
+Otherwise, log in apitracker and go to 'compose'
+"""
 
 import json
 import logging
-import cloudstorage as gcs
 
+import cloudstorage as gcs
 from google.appengine.api import search, taskqueue
 import webapp2
 
@@ -30,6 +37,8 @@ from config import DOWNLOAD_VERSION, TEMP_BUCKET, FILE_EXTENSION, \
 
 class WriteHandler(webapp2.RequestHandler):
     def post(self):
+
+        # Get params from request
         q, email, name, latlon = map(self.request.get,
                                      ['q', 'email', 'name', 'latlon'])
         q = json.loads(q)

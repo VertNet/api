@@ -21,7 +21,6 @@ import logging
 from datetime import datetime
 
 from google.appengine.api import taskqueue
-# import cloudstorage as gcs
 import webapp2
 
 # import search as vnsearch
