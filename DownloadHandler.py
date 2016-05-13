@@ -53,7 +53,7 @@ class DownloadHandler(webapp2.RequestHandler):
             taskqueue.add(
                 url='/service/download/count',
                 params=params,
-                # queue_name="count"
+                queue_name="test"
             )
         else:
             logging.info("Full download requested")

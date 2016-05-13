@@ -1,11 +1,11 @@
 # CODEBASE INFO
-# Last pushed to master branch: 2016-05-10T19:37:15+CEST
-# Last change to master branch: Working 'search' method
+# Last pushed to master branch: 2016-05-13T09:27:19+CEST
+# Last change to master branch: Working 'count' download method
 # Last pushed to dev branch: ?
 # Last change to dev branch: ?
 #
 # DEPLOYMENT INFO
-# Last deployed dev version: 2016-05-10T19:24:26+CEST
+# Last deployed dev version: 2016-05-13T09:26:56+CEST
 # Last deployed prod version: ?
 # command: gcloud preview app deploy api.yaml
 # args:
@@ -16,7 +16,8 @@
 # TODO:
 #   - DownloadApi: turn self.redirect to urlfetch and return output as JSON
 #   - DownloadHandler: make handler return JSON with result
-  
+#   - CountHandler: look for ways of optimizing count retrieval
+
 module: api-module
 runtime: python27
 api_version: 1
