@@ -150,10 +150,10 @@ class WriteHandler(webapp2.RequestHandler):
                 )
 
                 # Log the download
-                taskqueue.add(
-                    url='/apitracker', params=apitracker_params,
-                    queue_name="apitracker"
-                )
+                # taskqueue.add(
+                #     url='/apitracker', params=apitracker_params,
+                #     queue_name="apitracker"
+                # )
 
                 taskqueue.add(
                     url='/service/download/compose', params=composeparams,
@@ -193,10 +193,10 @@ class WriteHandler(webapp2.RequestHandler):
                 requesttime=requesttime
             )
 
-            taskqueue.add(
-                url='/apitracker', params=apitracker_params,
-                queue_name="apitracker"
-            )
+            # taskqueue.add(
+            #     url='/apitracker', params=apitracker_params,
+            #     queue_name="apitracker"
+            # )
 
             # Finalize and email.
             taskqueue.add(
