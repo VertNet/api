@@ -25,6 +25,7 @@ import webapp2
 
 from SearchAPI import SearchApi
 from DownloadAPI import DownloadApi
+from FeedbackAPI import FeedbackApi
 
 from DownloadHandler import DownloadHandler
 from CountHandler import CountHandler
@@ -49,7 +50,7 @@ VERSION = '2016-05-10T18:06:45+CEST'
 routes = [
     webapp2.Route(r'/api/search', handler=SearchApi),
     webapp2.Route(r'/api/download', handler=DownloadApi),
-    # webapp2.Route(r'/api/feedback', handler=FeedbackApi),
+    webapp2.Route(r'/api/feedback', handler=FeedbackApi),
 
     webapp2.Route(r'/service/download', handler=DownloadHandler),
     webapp2.Route(r'/service/download/count', handler=CountHandler),
