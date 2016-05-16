@@ -15,6 +15,12 @@
 
 """Search API.
 
+Args:
+  q: query object, JSON-like string with query parameters
+  c: cursor
+  l: limit, maximum number of records to return
+  s: sorting information
+
 Get query parameters
 Get records from vnsearch.query
 Log in apitracker and return results
@@ -48,7 +54,7 @@ class SearchApi(webapp2.RequestHandler):
                                                               API_VERSION))
         # TODO: Add clause to catch missing 'q' error
         request = json.loads(self.request.get('q'))
-        q, c, limit = map(request.get, ['q', 'c', 'l'])
+        q, c, limit, s = map(request.get, ['q', 'c', 'l', 's'])
 
         # Set the limit to 400 by default.  This value is based on the results
         # of substantial performance testing.
@@ -66,7 +72,11 @@ class SearchApi(webapp2.RequestHandler):
         else:
             curs = search.Cursor()
 
-        result = vnsearch.query(q, limit, 'dwc', sort=None, curs=curs)
+        sort = None
+        if s:
+            sort = s
+
+        result = vnsearch.query(q, limit, 'dwc', sort=sort, curs=curs)
         response = None
 
         if len(result) == 4:
