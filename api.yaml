@@ -29,13 +29,9 @@ handlers:
 
 - url: /api/*.*
   script: api.handlers
-  http_headers:
-    Access-Control-Allow-Origin: *
 - url: /service/*.*
   script: api.handlers
-  http_headers:
-    Access-Control-Allow-Origin: *
-    
+
 libraries:
 - name: webapp2
   version: "2.5.2"
