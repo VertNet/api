@@ -30,6 +30,7 @@ import json
 import urllib
 import logging
 
+from google.appengine.api import taskqueue
 import webapp2
 
 API_VERSION = 'api.py 2016-05-10T18:23:51+CEST'
@@ -53,6 +54,9 @@ class DownloadApi(webapp2.RequestHandler):
         self.get()
 
     def get(self):
+        self.response.headers.add_header("Access-Control-Allow-Origin", "*")
+        self.response.headers['Content-Type'] = "application/json"
+
         # Receive the download request and redirect it to the download URL
         logging.info('Version: %s\nAPI download request: %s'
                      % (API_VERSION, self.request))
@@ -60,14 +64,21 @@ class DownloadApi(webapp2.RequestHandler):
         q, e, n, countonly = map(request.get, ['q', 'e', 'n', 'c'])
         keywords = q.split()
         if countonly is not None:
-            params = urllib.urlencode(dict(
+            params = dict(
                 keywords=json.dumps(keywords),
-                count=0, email=e, countonly=True, api=API_VERSION)
+                count=0, email=e, countonly=True, api=API_VERSION
             )
+
         else:
-            params = urllib.urlencode(dict(
+            params = dict(
                 keywords=json.dumps(keywords), count=0,
-                email=e, name=n, api=API_VERSION)
+                email=e, name=n, api=API_VERSION
             )
-        url = '/service/download?%s' % params
-        self.redirect(url)
+
+        taskqueue.add(url="/service/download",
+                      params=params)
+
+        resp = {}
+        self.response.write(resp)
+        # url = '/service/download?%s' % params
+        # self.redirect(url)

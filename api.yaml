@@ -29,6 +29,7 @@ handlers:
 
 - url: /api/*.*
   script: api.handlers
+
 - url: /service/*.*
   script: api.handlers
 
