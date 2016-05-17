@@ -76,6 +76,7 @@ class SearchApi(webapp2.RequestHandler):
         if s:
             sort = s
 
+        logging.info("Calling with SORT %s" % sort)
         result = vnsearch.query(q, limit, 'dwc', sort=sort, curs=curs)
         response = None
 

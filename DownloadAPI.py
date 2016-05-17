@@ -15,7 +15,15 @@
 
 """Download API.
 
-Initialize download service
+Initialize download service.
+
+Endpoint:
+  http://api-module.vertnet-portal.appspot.com/api/download
+Args:
+  q: query object. E.g. "mappable:1 institutioncode:kstc"
+  e: email to send notification to
+  n: name of the download file
+  c: counts only, return only number of records and not records themselves
 """
 
 import json
