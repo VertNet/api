@@ -64,10 +64,10 @@ class QueryLogger(webapp2.RequestHandler):
             res_counts = json.loads(res_counts)
             params['results_by_resource'] = []
             for i in res_counts:
-                ResourceLogEntry(id=i,
-                                 parent=log_entry_key,
-                                 count=res_counts[i])
-                params['results_by_resource'].append(ResourceLogEntry)
+                r = ResourceLogEntry(id=i,
+                                     parent=log_entry_key,
+                                     count=res_counts[i])
+                params['results_by_resource'].append(r)
 
         # Update LogEntry entity (only if existing results_by_resource)
 

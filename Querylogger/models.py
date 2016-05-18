@@ -19,7 +19,6 @@ from google.appengine.ext import ndb
 class ResourceLogEntry(ndb.Model):
     """Model for the count of records for a particular resource on a
 particular query event. Id is gbifdatasetid, ancestor is LogEntry id."""
-    # gbifdatasetid = ndb.StringProperty(required=True)
     count = ndb.IntegerProperty(required=True)
 
 
