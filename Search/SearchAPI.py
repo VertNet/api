@@ -33,7 +33,7 @@ from datetime import datetime
 from google.appengine.api import search, taskqueue
 import webapp2
 
-import search as vnsearch
+import Search.search as vnsearch
 import util as vnutil
 
 API_VERSION = 'api.py 2016-05-10T18:23:51+CEST'
@@ -126,12 +126,11 @@ class SearchApi(webapp2.RequestHandler):
                 type=type
             )
 
-            # TODO: Implement apitracker
-            # taskqueue.add(
-            #     url='/apitracker',
-            #     params=params,
-            #     queue_name="apitracker"
-            # )
+            taskqueue.add(
+                url='/apitracker',
+                payload=json.dumps(params),
+                # queue_name="apitracker"
+            )
         else:
             error = result[0].__class__.__name__
             params = dict(
@@ -140,11 +139,11 @@ class SearchApi(webapp2.RequestHandler):
                 type='query',
                 latlon=self.cityLatLong
             )
-            # taskqueue.add(
-            #     url='/apitracker',
-            #     params=params,
-            #     queue_name="apitracker"
-            # )
+            taskqueue.add(
+                url='/apitracker',
+                params=params,
+                # queue_name="apitracker"
+            )
             self.response.clear()
             message = 'Please try again. Error: %s' % error
             self.response.set_status(500, message=message)

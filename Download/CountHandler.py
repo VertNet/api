@@ -27,7 +27,7 @@ from datetime import datetime
 from google.appengine.api import search, taskqueue, mail
 import webapp2
 
-import search as vnsearch
+import Search.search as vnsearch
 from config import OPTIMUM_CHUNK_SIZE, DOWNLOAD_VERSION
 
 

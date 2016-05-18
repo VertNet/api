@@ -78,7 +78,13 @@ class DownloadApi(webapp2.RequestHandler):
         taskqueue.add(url="/service/download",
                       params=params)
 
-        resp = {}
-        self.response.write(resp)
+        resp = {
+            "result": "success",
+            "file_name": n,
+            "email": e,
+            "query": q,
+            "api_version": API_VERSION
+        }
+        self.response.write(json.dumps(resp))
         # url = '/service/download?%s' % params
         # self.redirect(url)

@@ -18,16 +18,19 @@
 import webapp2
 
 # API methods
-from SearchAPI import SearchApi
-from DownloadAPI import DownloadApi
-from FeedbackAPI import FeedbackApi
+from Search.SearchAPI import SearchApi
+from Download.DownloadAPI import DownloadApi
+from Feedback.FeedbackAPI import FeedbackApi
 
 # Complementary services
-from DownloadHandler import DownloadHandler
-from CountHandler import CountHandler
-from WriteHandler import WriteHandler
-from ComposeHandler import ComposeHandler
-from CleanupHandler import CleanupHandler
+from Download.DownloadHandler import DownloadHandler
+from Download.CountHandler import CountHandler
+from Download.WriteHandler import WriteHandler
+from Download.ComposeHandler import ComposeHandler
+from Download.CleanupHandler import CleanupHandler
+
+# Query logging
+from Querylogger.QueryLogger import QueryLogger
 
 routes = [
     # API methods
@@ -41,6 +44,9 @@ routes = [
     webapp2.Route(r'/service/download/write', handler=WriteHandler),
     webapp2.Route(r'/service/download/compose', handler=ComposeHandler),
     webapp2.Route(r'/service/download/cleanup', handler=CleanupHandler),
+
+    # Query logging
+    webapp2.Route(r'/apitracker', handler=QueryLogger),
 ]
 
 handlers = webapp2.WSGIApplication(routes, debug=True)

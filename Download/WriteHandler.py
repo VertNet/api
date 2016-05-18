@@ -29,7 +29,7 @@ import cloudstorage as gcs
 from google.appengine.api import search, taskqueue
 import webapp2
 
-import search as vnsearch
+import Search.search as vnsearch
 import util as vnutil
 from config import DOWNLOAD_VERSION, TEMP_BUCKET, FILE_EXTENSION, \
     SEARCH_CHUNK_SIZE, DOWNLOAD_BUCKET, COMPOSE_OBJECT_LIMIT

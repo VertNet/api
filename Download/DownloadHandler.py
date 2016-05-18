@@ -71,8 +71,6 @@ class DownloadHandler(webapp2.RequestHandler):
 
     def get(self):
 
-        self.response.headers.add_header("Access-Control-Allow-Origin", "*")
-
         # Get params from request
         count, keywords, email, name = map(
             self.request.get,
