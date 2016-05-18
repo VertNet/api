@@ -17,6 +17,7 @@ import os
 import json
 import logging
 
+from google.appengine.api import namespace_manager
 import webapp2
 
 from Querylogger.models import ResourceLogEntry, LogEntry
@@ -31,6 +32,10 @@ else:
 
 class QueryLogger(webapp2.RequestHandler):
     def post(self):
+
+        # Move to 'default' namespace
+        previous_namespace = namespace_manager.get_namespace()
+        namespace_manager.set_namespace('default')
 
         # Get parameters from request body
 
@@ -53,7 +58,7 @@ class QueryLogger(webapp2.RequestHandler):
 
         res_counts = params.pop('res_counts')
 
-        # Build and store LogEntry entity
+        # Build and store LogEntry entity in default namespace
 
         log_entry = LogEntry(**params)
         log_entry_key = log_entry.put()
@@ -74,6 +79,10 @@ class QueryLogger(webapp2.RequestHandler):
             log_entry = log_entry_key.get()
             log_entry.results_by_resource = params['results_by_resource']
             log_entry_key = log_entry.put()
+
+        # Restore previous namespace
+
+        namespace_manager.set_namespace(previous_namespace)
 
         # Send response and finish call
 
