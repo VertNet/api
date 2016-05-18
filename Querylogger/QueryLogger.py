@@ -84,4 +84,4 @@ class QueryLogger(webapp2.RequestHandler):
             "log_entry": params
         }
         logging.info(resp)
-        self.response.write(json.dumps(resp)+"\n")
+        return
