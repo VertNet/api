@@ -26,8 +26,6 @@ from google.appengine.api import namespace_manager
 from google.appengine.api import search
 from google.appengine.api.search import SortOptions, SortExpression
 
-from config import SEARCH_VERSION
-
 
 def _get_rec(doc):
     """ Construct an output record from the index document """
@@ -51,17 +49,14 @@ def query(q, limit, index_name='dwc', sort=None, curs=search.Cursor()):
             recs = map(_get_rec, results)
             logging.info('One result from search.Index()'
                          ' for namespace=%s index_name=%s'
-                         ' query=%s\nVersion: %s' % (namespace,
-                                                     index_name,
-                                                     q,
-                                                     SEARCH_VERSION))
-            return recs, None, 1, SEARCH_VERSION
+                         ' query=%s\n' % (namespace, index_name, q))
+            return recs, None, 1
         else:
             logging.info('No results from search.Index() for namespace=%s'
-                         ' index_name=%s query=%s\nVersion: %s' % (
-                             namespace, index_name, q, SEARCH_VERSION)
+                         ' index_name=%s query=%s\n' % (
+                             namespace, index_name, q)
                          )
-            return [], None, 0, SEARCH_VERSION
+            return [], None, 0
 
     expressions = []
 
@@ -69,8 +64,8 @@ def query(q, limit, index_name='dwc', sort=None, curs=search.Cursor()):
         expressions.append(SortExpression(expression=sort, default_value='z',
                            direction=SortExpression.ASCENDING))
         sort_options = SortOptions(expressions=expressions, limit=limit)
-        logging.info('Sort options: %s\nVersion: %s' %
-                     (sort_options, SEARCH_VERSION))
+        logging.info('Sort options: %s\n' %
+                     (sort_options))
 
         options = search.QueryOptions(
             limit=limit,
@@ -102,27 +97,24 @@ def query(q, limit, index_name='dwc', sort=None, curs=search.Cursor()):
             if results:
                 recs = map(_get_rec, results)
                 logging.info('Query: %s results from search.Index() for'
-                             ' namespace=%s index_name=%s query=%s\n'
-                             'Version: %s'
+                             ' namespace=%s index_name=%s query=%s'
                              % (q, results.number_found, namespace,
-                                index_name, SEARCH_VERSION))
-                return recs, results.cursor,\
-                    results.number_found, SEARCH_VERSION
+                                index_name))
+                return recs, results.cursor, results.number_found
             else:
                 logging.info('No results from query %s for namespace=%s'
-                             ' index_name=%s\nVersion: %s'
-                             % (q, namespace, index_name, SEARCH_VERSION))
-                return [], None, 0, SEARCH_VERSION
+                             ' index_name=%s\n'
+                             % (q, namespace, index_name))
+                return [], None, 0
         except Exception, e:
             logging.error('Search failed.\nQUERY:\n'
-                          ' %s\nERROR:\n%s\nVersion: %s'
-                          % (q, e, SEARCH_VERSION))
+                          ' %s\nERROR:\n%s\n' % (q, e))
             # error = e
             retry_count += 1
     logging.info('Finally no results from query %s for namespace=%s'
-                 ' index_name=%s\nVersion: %s'
-                 % (q, namespace, index_name, SEARCH_VERSION))
-    return [], None, 0, SEARCH_VERSION
+                 ' index_name=%s\n'
+                 % (q, namespace, index_name))
+    return [], None, 0
 
 
 def query_rec_counter(q, limit, index_name='dwc',
@@ -139,12 +131,12 @@ Returns count of records in search, new cursor """
             start_id=did, limit=1)
         if results:
             recs = len(results.results)
-            return recs, None, SEARCH_VERSION
+            return recs, None
         else:
             logging.info('No results from search.Index() for namespace=%s'
-                         ' index_name=%s query=%s\nVersion: %s' %
-                         (namespace, index_name, q, SEARCH_VERSION))
-            return 0, None, SEARCH_VERSION
+                         ' index_name=%s query=%s\n' %
+                         (namespace, index_name, q))
+            return 0, None
 
     # Always use 10,000 as the value for number_found_accuracy.  Based on
     # extensive testing, using this maximum allowed value results in the best
@@ -169,19 +161,17 @@ Returns count of records in search, new cursor """
             ).search(query)
             if results:
                 recs = len(results.results)
-                return recs, results.cursor, SEARCH_VERSION
+                return recs, results.cursor
             else:
                 logging.info('No results from query %s for namespace=%s'
-                             'index_name=%s\nVersion: %s'
-                             % (q, namespace, index_name, SEARCH_VERSION))
-                return 0, None, SEARCH_VERSION
+                             'index_name=%s\n'
+                             % (q, namespace, index_name))
+                return 0, None
         except Exception, e:
-            logging.error('Search failed.\nQUERY:\n %s\nERROR:\n%s\n'
-                          'Version: %s' %
-                          (q, e, SEARCH_VERSION))
+            logging.error('Search failed.\nQUERY:\n %s\nERROR:\n%s\n' % (q, e))
             # error = e
             retry_count += 1
     logging.info('Finally no results from query %s for namespace=%s'
-                 'index_name=%s\nVersion: %s'
-                 % (q, namespace, index_name, SEARCH_VERSION))
-    return 0, None, SEARCH_VERSION
+                 'index_name=%s\n'
+                 % (q, namespace, index_name))
+    return 0, None

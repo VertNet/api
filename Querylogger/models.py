@@ -29,6 +29,7 @@ class LogEntry(ndb.Model):
     lat = ndb.FloatProperty()
     lon = ndb.FloatProperty()
     country = ndb.StringProperty()
+    user_agent = ndb.StringProperty()
     created_at = ndb.DateTimeProperty(auto_now_add=True)
     updated_at = ndb.DateTimeProperty(auto_now=True)
 
@@ -38,7 +39,6 @@ class LogEntry(ndb.Model):
     type = ndb.StringProperty()
     api_version = ndb.StringProperty(required=True)
     request_source = ndb.StringProperty(required=True)
-    query_version = ndb.StringProperty(required=True)
 
     # Query result metadata
     error = ndb.StringProperty()

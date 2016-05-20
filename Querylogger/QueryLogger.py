@@ -22,6 +22,8 @@ import webapp2
 
 from Querylogger.models import ResourceLogEntry, LogEntry
 
+LOGGER_VERSION = 'logger 2016-05-20T08:53:16+CEST'
+
 IS_DEV = os.environ.get('SERVER_SOFTWARE', '').startswith('Development')
 
 if IS_DEV:
@@ -33,9 +35,10 @@ else:
 class QueryLogger(webapp2.RequestHandler):
     def post(self):
 
-        # Move to 'default' namespace
+        # Move to default namespace
         previous_namespace = namespace_manager.get_namespace()
-        namespace_manager.set_namespace('default')
+        namespace_manager.set_namespace('query_log')
+        current_namespace = namespace_manager.get_namespace()
 
         # Get parameters from request body
 
@@ -89,6 +92,8 @@ class QueryLogger(webapp2.RequestHandler):
         resp = {
             "status": "success",
             "message": "new log entry successfully added",
+            "namespace": current_namespace,
+            "logger_version": LOGGER_VERSION,
             "log_entry_key": log_entry.key.id(),
             "log_entry": params
         }

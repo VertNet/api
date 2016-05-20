@@ -36,14 +36,16 @@ import webapp2
 import Search.search as vnsearch
 import util as vnutil
 
-API_VERSION = 'api.py 2016-05-10T18:23:51+CEST'
+SEARCH_VERSION = 'search 2016-05-19T18:27:16+CEST'
 
 
 class SearchApi(webapp2.RequestHandler):
     def __init__(self, request, response):
         self.cityLatLong = request.headers.get('X-AppEngine-CityLatLong')
+        self.country = request.headers.get('X-AppEngine-Country')
+        self.user_agent = request.headers.get('User-Agent')
         logging.info('Init Request headers: %s\nVersion: %s' %
-                     (request.headers, API_VERSION))
+                     (request.headers, SEARCH_VERSION))
         self.initialize(request, response)
 
     def post(self):
@@ -51,7 +53,7 @@ class SearchApi(webapp2.RequestHandler):
 
     def get(self):
         logging.info('API search request: %s\nVersion: %s' % (self.request,
-                                                              API_VERSION))
+                                                              SEARCH_VERSION))
         # TODO: Add clause to catch missing 'q' error
         request = json.loads(self.request.get('q'))
         q, c, limit, s = map(request.get, ['q', 'c', 'l', 's'])
@@ -80,8 +82,8 @@ class SearchApi(webapp2.RequestHandler):
         result = vnsearch.query(q, limit, 'dwc', sort=sort, curs=curs)
         response = None
 
-        if len(result) == 4:
-            recs, cursor, count, query_version = result
+        if len(result) == 3:
+            recs, cursor, count = result
             if not c:
                 type = 'query'
                 # query_count = count
@@ -110,20 +112,20 @@ class SearchApi(webapp2.RequestHandler):
             response = json.dumps(dict(
                 recs=recs, cursor=cursor, matching_records=count,
                 limit=limit, response_records=len(recs),
-                api_version=API_VERSION, query_version=query_version,
-                request_date=d.isoformat(), request_origin=self.cityLatLong
+                api_version=SEARCH_VERSION, request_date=d.isoformat(),
+                request_origin=self.cityLatLong
             ))
 
             logging.info('API search recs: %s\nVersion: %s' % (recs,
-                                                               API_VERSION))
+                                                               SEARCH_VERSION))
             res_counts = vnutil.search_resource_counts(recs)
 
             params = dict(
-                api_version=API_VERSION, count=len(recs),
-                latlon=self.cityLatLong, matching_records=count, query=q,
-                query_version=query_version, request_source='SearchAPI',
+                api_version=SEARCH_VERSION, count=len(recs),
+                country=self.country, latlon=self.cityLatLong,
+                matching_records=count, query=q, request_source='SearchAPI',
                 response_records=len(recs), res_counts=json.dumps(res_counts),
-                type=type
+                type=type, user_agent=self.user_agent
             )
 
             taskqueue.add(
