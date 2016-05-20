@@ -1,10 +1,10 @@
 # CODEBASE INFO
-# Last pushed to master branch: 2016-05-13T12:49:46+CEST
-# Last change to master branch: Finished refurbishing api module
+# Last pushed to master branch: 2016-05-20T08:54:44+CEST
+# Last change to master branch: Implemented query logging
 #
 # DEPLOYMENT INFO
-# Last deployed dev version: 2016-05-13T12:17:55+CEST
-# Last deployed prod version: 2016-05-13T12:21:05+CEST
+# Last deployed dev version: 2016-05-20T08:54:44+CEST
+# Last deployed prod version: 2016-05-20T08:54:44+CEST
 # command: gcloud preview app deploy api.yaml
 # args:
 #   --project vertnet-portal  # Optional, no need if gcloud is configured to use this project
