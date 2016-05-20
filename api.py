@@ -30,13 +30,15 @@ from Download.ComposeHandler import ComposeHandler
 from Download.CleanupHandler import CleanupHandler
 
 # Query logging
-from Querylogger.QueryLogger import QueryLogger
+from Logger.QueryLogger import QueryLogger
+
+LAST_UPDATED = '2016-05-20T12:37:29+CEST'
 
 routes = [
-    # API methods
-    webapp2.Route(r'/api/search', handler=SearchApi),
-    webapp2.Route(r'/api/download', handler=DownloadApi),
-    webapp2.Route(r'/api/feedback', handler=FeedbackApi),
+    # API methods, v1 (2016-05-20T12:37:29+CEST)
+    webapp2.Route(r'/api/v1/search', handler=SearchApi),
+    webapp2.Route(r'/api/v1/download', handler=DownloadApi),
+    webapp2.Route(r'/api/v1/feedback', handler=FeedbackApi),
 
     # Complementary services
     webapp2.Route(r'/service/download', handler=DownloadHandler),

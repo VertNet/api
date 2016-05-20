@@ -31,8 +31,10 @@ from oauth2client.client import GoogleCredentials
 from apiclient import discovery
 import webapp2
 
-from config import DOWNLOAD_VERSION, TEMP_BUCKET, FILE_EXTENSION, \
+from config import TEMP_BUCKET, FILE_EXTENSION, \
     DOWNLOAD_BUCKET, COMPOSE_FILE_LIMIT, COMPOSE_OBJECT_LIMIT
+
+LAST_UPDATED = '2016-05-20T12:37:29+CEST'
 
 
 def acl_update_request():
@@ -77,9 +79,9 @@ end - begin plus the number of files to put in the composition
 class ComposeHandler(webapp2.RequestHandler):
 
     def post(self):
-        q, email, name, filepattern, latlon = map(
+        q, email, name, filepattern, DOWNLOAD_VERSION = map(
             self.request.get,
-            ['q', 'email', 'name', 'filepattern', 'latlon']
+            ['q', 'email', 'name', 'filepattern', 'fromapi']
         )
         requesttime = self.request.get('requesttime')
         composed_filepattern = '%s-cl' % filepattern
@@ -232,7 +234,7 @@ Request fulfilled: %s"""
 
         cleanupparams = dict(filepattern=filepattern,
                              fileindex=total_files_to_compose,
-                             compositions=compositions)
+                             compositions=compositions, api=DOWNLOAD_VERSION)
         taskqueue.add(
             url='/service/download/cleanup', params=cleanupparams,
             queue_name="cleanup"

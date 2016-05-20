@@ -22,6 +22,7 @@ If more chunks to process, repeat
 Otherwise, log in apitracker and go to 'compose'
 """
 
+import os
 import json
 import logging
 
@@ -31,16 +32,26 @@ import webapp2
 
 import Search.search as vnsearch
 import util as vnutil
-from config import DOWNLOAD_VERSION, TEMP_BUCKET, FILE_EXTENSION, \
-    SEARCH_CHUNK_SIZE, DOWNLOAD_BUCKET, COMPOSE_OBJECT_LIMIT
+from config import TEMP_BUCKET, FILE_EXTENSION, SEARCH_CHUNK_SIZE, \
+    DOWNLOAD_BUCKET, COMPOSE_OBJECT_LIMIT
+
+LAST_UPDATED = '2016-05-20T12:37:29+CEST'
+
+IS_DEV = os.environ.get('SERVER_SOFTWARE', '').startswith('Development')
+if IS_DEV:
+    QUEUE_NAME = 'default'
+else:
+    QUEUE_NAME = 'apitracker'
 
 
 class WriteHandler(webapp2.RequestHandler):
     def post(self):
 
         # Get params from request
-        q, email, name, latlon = map(self.request.get,
-                                     ['q', 'email', 'name', 'latlon'])
+        q, email, name, latlon, country, user_agent = map(
+            self.request.get,
+            ['q', 'email', 'name', 'latlon', 'country', 'user_agent']
+        )
         q = json.loads(q)
         requesttime = self.request.get('requesttime')
         filepattern = self.request.get('filepattern')
@@ -65,7 +76,7 @@ class WriteHandler(webapp2.RequestHandler):
             curs = None
 
         # Write single chunk to file, GCS does not support append
-        records, next_cursor, count, query_version = \
+        records, next_cursor, count = \
             vnsearch.query(q, SEARCH_CHUNK_SIZE, curs=curs)
         # Build dict for search counts
         res_counts = vnutil.search_resource_counts(records, total_res_counts)
@@ -106,11 +117,11 @@ class WriteHandler(webapp2.RequestHandler):
                     logging.info('Download chunk saved to %s: Total %s records'
                                  ' Has next cursor: %s \nVersion: %s'
                                  % (filename, reccount,
-                                    next_cursor is not None, DOWNLOAD_VERSION))
+                                    next_cursor is not None, fromapi))
             except Exception, e:
                 logging.error("Error writing chunk to FILE: %s for\nQUERY: %s"
                               "Error: %s\nVersion: %s" %
-                              (filename, q, e, DOWNLOAD_VERSION))
+                              (filename, q, e, fromapi))
                 retry_count += 1
 #                raise e
 
@@ -126,79 +137,56 @@ class WriteHandler(webapp2.RequestHandler):
         finalfilename = '/%s/%s.%s' % (DOWNLOAD_BUCKET, filepattern,
                                        FILE_EXTENSION)
 
-        if curs:
+        if curs and fileindex <= COMPOSE_OBJECT_LIMIT:
+            # Opt not to support downloads of more than
+            # COMPOSE_OBJECT_LIMIT*SEARCH_CHUNK_SIZE records
+            # Stop composing results at this limit.
+
             fileindex = fileindex + 1
 
-            if fileindex > COMPOSE_OBJECT_LIMIT:
-                # Opt not to support downloads of more than
-                # COMPOSE_OBJECT_LIMIT*SEARCH_CHUNK_SIZE records
-                # Stop composing results at this limit.
+            writeparams = dict(
+                q=self.request.get('q'), email=email, name=name,
+                filepattern=filepattern, latlon=latlon, cursor=curs,
+                fileindex=fileindex,
+                res_counts=json.dumps(total_res_counts), reccount=reccount,
+                requesttime=requesttime, fromapi=fromapi, source=source
+            )
 
-                apitracker_params = dict(
-                    api_version=fromapi, count=reccount,
-                    download=finalfilename, downloader=email, error=None,
-                    latlon=latlon, matching_records=reccount, query=q,
-                    query_version=query_version, request_source=source,
-                    response_records=len(records),
-                    res_counts=json.dumps(total_res_counts), type='download'
-                )
-
-                composeparams = dict(
-                    email=email, name=name, filepattern=filepattern, q=q,
-                    fileindex=fileindex, reccount=reccount,
-                    requesttime=requesttime
-                )
-
-                # Log the download
-                # taskqueue.add(
-                #     url='/apitracker', params=apitracker_params,
-                #     queue_name="apitracker"
-                # )
-
-                taskqueue.add(
-                    url='/service/download/compose', params=composeparams,
-                    queue_name="compose"
-                )
-            else:
-                writeparams = dict(
-                    q=self.request.get('q'), email=email, name=name,
-                    filepattern=filepattern, latlon=latlon, cursor=curs,
-                    fileindex=fileindex,
-                    res_counts=json.dumps(total_res_counts), reccount=reccount,
-                    requesttime=requesttime, fromapi=fromapi, source=source
-                )
-
-#                logging.info('Sending total_res_counts to write again: %s'
-#                    % total_res_counts)
-                # Keep writing search chunks to files
-                taskqueue.add(
-                    url='/service/download/write', params=writeparams,
-                    queue_name="downloadwrite"
-                )
+            # Keep writing search chunks to files
+            taskqueue.add(
+                url='/service/download/write', params=writeparams,
+                queue_name="downloadwrite"
+            )
 
         else:
             # Log the download
             apitracker_params = dict(
-                api_version=fromapi, count=reccount, download=finalfilename,
-                downloader=email, error=None, latlon=latlon,
-                matching_records=reccount, query=q,
-                query_version=query_version, request_source=source,
+                latlon=latlon,
+                country=country,
+                user_agent=user_agent,
+                query=q,
+                type='download',
+                api_version=fromapi,
+                request_source=source,
+                error=None,
+                count=reccount,
+                matching_records=reccount,
                 response_records=len(records),
-                res_counts=json.dumps(total_res_counts), type='download'
+                res_counts=json.dumps(total_res_counts),
+                downloader=email,
+                download=finalfilename
+            )
+            taskqueue.add(
+                url='/apitracker', payload=json.dumps(apitracker_params),
+                queue_name=QUEUE_NAME
             )
 
+            # Finalize and email.
             composeparams = dict(
                 email=email, name=name, filepattern=filepattern, q=q,
                 fileindex=fileindex, reccount=reccount,
-                requesttime=requesttime
+                requesttime=requesttime, fromapi=fromapi
             )
-
-            # taskqueue.add(
-            #     url='/apitracker', params=apitracker_params,
-            #     queue_name="apitracker"
-            # )
-
-            # Finalize and email.
             taskqueue.add(
                 url='/service/download/compose', params=composeparams,
                 queue_name="compose"

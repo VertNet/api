@@ -25,13 +25,15 @@ from oauth2client.client import GoogleCredentials
 from apiclient import discovery
 import webapp2
 
-from config import FILE_EXTENSION, COMPOSE_FILE_LIMIT, TEMP_BUCKET, \
-    DOWNLOAD_VERSION
+from config import FILE_EXTENSION, COMPOSE_FILE_LIMIT, TEMP_BUCKET
+
+LAST_UPDATED = '2016-05-20T12:37:29+CEST'
 
 
 class CleanupHandler(webapp2.RequestHandler):
     def post(self):
         filepattern = self.request.get('filepattern')
+        DOWNLOAD_VERSION = self.request.get('api')
         compositions = int(self.request.get('compositions'))
         composed_filepattern = '%s-cl' % filepattern
         composed_filename = '%s.%s' % (filepattern, FILE_EXTENSION)

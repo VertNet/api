@@ -15,9 +15,9 @@
 
 """API methods configuration file.
 """
+LAST_UPDATED = '2016-05-20T10:11:43+CEST'
 
 # Versions
-DOWNLOAD_VERSION = 'download.py 2016-05-13T12:38:30+CEST'
 UTIL_VERSION = 'util.py 2016-05-13T12:38:30+CEST'
 
 # Download variables

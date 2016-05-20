@@ -29,12 +29,15 @@ import webapp2
 
 # import search as vnsearch
 # import util as vnutil
-from config import DOWNLOAD_VERSION, SEARCH_CHUNK_SIZE
+from config import SEARCH_CHUNK_SIZE
 # from config import DOWNLOAD_BUCKET, FILE_EXTENSION
+
+LAST_UPDATED = '2016-05-20T12:37:29+CEST'
 
 
 class DownloadHandler(webapp2.RequestHandler):
-    def _queue(self, q, email, name, latlon, fromapi, source, countonly):
+    def _queue(self, q, email, name, latlon, fromapi, source, countonly,
+               country, user_agent):
         # Create a base filename for all chunks to be composed for
         # this download
         filepattern = '%s-%s' % (name, uuid.uuid4().hex)
@@ -45,7 +48,8 @@ class DownloadHandler(webapp2.RequestHandler):
         params = dict(
             q=json.dumps(q), email=email, name=name, filepattern=filepattern,
             latlon=latlon, fileindex=0, reccount=0, requesttime=requesttime,
-            source=source, fromapi=fromapi
+            source=source, fromapi=fromapi, country=country,
+            user_agent=user_agent
         )
 
         logging.info("About to launch download with following params")
@@ -72,75 +76,73 @@ class DownloadHandler(webapp2.RequestHandler):
     def get(self):
 
         # Get params from request
-        count, keywords, email, name = map(
-            self.request.get,
-            ['count', 'keywords', 'email', 'name']
-        )
+        keywords = self.request.get("keywords")
+        count = self.request.get("count")
+        email = self.request.get("email")
+        DOWNLOAD_VERSION = self.request.get("api")
+        source = self.request.get("source")
+        latlon = self.request.get("latlon")
+        country = self.request.get("country")
+        user_agent = self.request.get("user_agent")
+
+        # Optional params
+        countonly = self.request.get("countonly")
+        name = self.request.get("name")
 
         # Build query string
         q = ' '.join(json.loads(keywords))
 
-        # Calculate other parameters
-        latlon = self.request.headers.get('X-AppEngine-CityLatLong')
-        fromapi = self.request.get('api')
-        countonly = self.request.get('countonly')
         # Force count to be an integer
         # count is a limit on the number of records to download
         count = int(str(count))
 
-        source = 'DownloadPortal'
-        # This will always be the case from now on
-        if fromapi is not None and len(fromapi) > 0:
-            source = 'DownloadAPI'
-            # Try to send an indicator to the browser if it came from one.
-            body = ''
-            if countonly is not None and len(countonly) > 0:
-                body = 'Counting results:<br>'
-                source = 'CountAPI'
-            else:
-                body = 'Downloading results:<br>'
-            if email is None or len(email) == 0 or email == 'None':
-                body += 'ERROR: You must provide an email address.'
-            else:
-                body += 'File name: %s<br>' % name
-                body += 'Email: %s<br>' % email
-                body += 'Keywords: %s<br>' % keywords
-                body += 'X-AppEngine-CityLatLong: %s<br>' % latlon
-                body += 'Source: %s<br>' % source
-                body += 'API: %s<br>' % fromapi
-                body += 'Request headers: %s<br>' % self.request.headers
+        # Try to send an indicator to the browser if it came from one.
+        body = ''
+        if countonly is True:
+            body = 'Counting results:<br>'
+            source = 'CountAPI'
+        else:
+            body = 'Downloading results:<br>'
+        if email is None or len(email) == 0 or email == 'None':
+            body += 'ERROR: You must provide an email address.'
+        else:
+            body += 'File name: %s<br>' % name
+            body += 'Email: %s<br>' % email
+            body += 'Keywords: %s<br>' % keywords
+            body += 'X-AppEngine-CityLatLong: %s<br>' % latlon
+            body += 'X-AppEngine-Country: %s<br>' % country
+            body += 'User-Agent: %s<br>' % user_agent
+            body += 'Source: %s<br>' % source
+            body += 'API: %s<br>' % DOWNLOAD_VERSION
+            body += 'Request headers: %s<br>' % self.request.headers
 
-            self.response.out.write(body)
-            logging.info('API download request. API: %s Source: %s Count: %s \
-Keywords: %s Email: %s Name: %s LatLon: %s\nVersion: %s'
-                         % (fromapi, source, count, keywords, email, name,
-                            latlon, DOWNLOAD_VERSION))
-            if email is None or len(email) == 0:
-                return
-
-# # NOT GOING TO HAPPEN ANYMORE. ALL DOWNLOADS WILL COME FROM API
-#         else:
-#             logging.info('Portal download request. API: %s Source: %s \
-# Count: %s Keywords: %s Email: %s Name: %s LatLon: %s\nVersion: %s'
-#                          % (fromapi, source, count, keywords, email, name,
-#                              latlon, DOWNLOAD_VERSION))
+        self.response.out.write(body)
+        logging.info('API download request. Source: %s Count: %s \
+Keywords: %s Email: %s Name: %s LatLon: %s User-Agent: %s\nVersion: %s'
+                     % (source, count, keywords, email, name,
+                        latlon, user_agent, DOWNLOAD_VERSION))
+        if email is None or len(email) == 0:
+            return
 
         if count == 0 or count > SEARCH_CHUNK_SIZE:
-            # The results are larger than SEARCH_CHUNK_SIZE,
-            # compose a file for download
-            self._queue(q, email, name, latlon, fromapi, source, countonly)
+            # The results are larger than SEARCH_CHUNK_SIZE, compose a file
+            self._queue(q, email, name, latlon, DOWNLOAD_VERSION, source,
+                        countonly, country, user_agent)
 
-# # WITH API DOWNLOADS, THIS 'else' WILL NEVER HAPPEN. REMOVE AFTER TESTING
+# # WITH CURRENT API DOWNLOADS, THIS 'else' WILL NEVER HAPPEN.
 #
 # # NOTE: This "could" happen if a more efficient 'count' method is implemented
 # # since that would allow for fast calculation of record counts and could
 # # redirect here if count <= 1K
+#
+#
+#
 #         else:
 #             # The results are smaller than SEARCH_CHUNK_SIZE,
 #             # download directly and make
 #             # a copy of the file in the download bucket
 #             filename = str('%s.txt' % name)
-#             self.response.headers['Content-Type'] = "text/tab-separated-values"
+#             self.response.headers['Content-Type']="text/tab-separated-values"
 #             self.response.headers['Content-Disposition'] = \
 #                 "attachment; filename=%s" % filename
 #             records, cursor, count, query_version = vnsearch.query(q, count)
@@ -177,8 +179,8 @@ Keywords: %s Email: %s Name: %s LatLon: %s\nVersion: %s'
 #                                   options={'x-goog-acl': 'public-read'}) as f:
 #                         f.write(data)
 #                         success = True
-# #                        logging.info('Sending small res_counts to tracker: %s'
-# #                            % res_counts )
+#                        logging.info('Sending small res_counts to tracker: %s'
+#                            % res_counts )
 #                         taskqueue.add(url='/apitracker',
 #                                       params=apitracker_params,
 #                                       queue_name="apitracker")

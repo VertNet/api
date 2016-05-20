@@ -26,6 +26,8 @@ from google.appengine.api import namespace_manager
 from google.appengine.api import search
 from google.appengine.api.search import SortOptions, SortExpression
 
+LAST_UPDATED = '2016-05-20T11:11:48+CEST'
+
 
 def _get_rec(doc):
     """ Construct an output record from the index document """

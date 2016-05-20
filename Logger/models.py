@@ -15,6 +15,8 @@
 
 from google.appengine.ext import ndb
 
+LAST_UPDATED = '2016-05-20T11:11:53+CEST'
+
 
 class ResourceLogEntry(ndb.Model):
     """Model for the count of records for a particular resource on a

@@ -15,6 +15,8 @@
 
 """Common utilities."""
 
+LAST_UPDATED = '2016-05-20T10:11:43+CEST'
+
 ADD_TO_DOWNLOAD_RESULTS = ['url', 'gbifdatasetid', 'gbifpublisherid', 'email',
                            'contact', 'migrator', 'pubdate', 'lastindexed',
                            'iptlicense']

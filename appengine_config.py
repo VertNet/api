@@ -19,6 +19,8 @@
 import os
 import sys
 
+LAST_UPDATED = '2016-05-20T10:11:43+CEST'
+
 IS_DEV = os.environ.get('SERVER_SOFTWARE', '').startswith('Development')
 sys.path.append(os.path.join(os.path.dirname(__file__), 'lib'))
 

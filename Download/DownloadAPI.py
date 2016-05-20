@@ -24,16 +24,24 @@ Args:
   e: email to send notification to
   n: name of the download file
   c: counts only, return only number of records and not records themselves
+  s: source, indicates query origin - api, portal...
 """
 
+import os
 import json
-import urllib
 import logging
 
 from google.appengine.api import taskqueue
 import webapp2
 
-API_VERSION = 'api.py 2016-05-10T18:23:51+CEST'
+LAST_UPDATED = '2016-05-20T12:37:29+CEST'
+DOWNLOAD_VERSION = 'download 2016-05-20T12:37:29+CEST'
+
+IS_DEV = os.environ.get('SERVER_SOFTWARE', '').startswith('Development')
+if IS_DEV:
+    QUEUE_NAME = 'default'
+else:
+    QUEUE_NAME = 'download'
 
 
 class DownloadApi(webapp2.RequestHandler):
@@ -47,44 +55,56 @@ class DownloadApi(webapp2.RequestHandler):
         "e":"you@gmail.com", "c":"True"}
     """
     def __init__(self, request, response):
-        self.cityLatLong = request.headers.get('X-AppEngine-CityLatLong')
+        self.latlon = request.headers.get('X-AppEngine-CityLatLong')
+        self.country = request.headers.get('X-AppEngine-Country')
+        self.user_agent = request.headers.get('User-Agent')
         self.initialize(request, response)
 
     def post(self):
         self.get()
 
     def get(self):
-        self.response.headers.add_header("Access-Control-Allow-Origin", "*")
-        self.response.headers['Content-Type'] = "application/json"
-
         # Receive the download request and redirect it to the download URL
         logging.info('Version: %s\nAPI download request: %s'
-                     % (API_VERSION, self.request))
+                     % (DOWNLOAD_VERSION, self.request))
         request = json.loads(self.request.get('q'))
-        q, e, n, countonly = map(request.get, ['q', 'e', 'n', 'c'])
+        q, e, n, countonly, source = map(request.get,
+                                         ['q', 'e', 'n', 'c', 's'])
         keywords = q.split()
+
+        # Apply default value to source parameter
+        if not source or source is None or source == "" or source == "None":
+            source = 'DownloadAPI'
+
+        params = {
+            "keywords": json.dumps(keywords),
+            "count": 0,
+            "email": e,
+            "api": DOWNLOAD_VERSION,
+            "source": source,
+            "latlon": self.latlon,
+            "country": self.country,
+            "user_agent": self.user_agent
+        }
+
         if countonly is not None:
-            params = dict(
-                keywords=json.dumps(keywords),
-                count=0, email=e, countonly=True, api=API_VERSION
-            )
+            params["countonly"] = True
 
         else:
-            params = dict(
-                keywords=json.dumps(keywords), count=0,
-                email=e, name=n, api=API_VERSION
-            )
+            params["name"] = n
 
         taskqueue.add(url="/service/download",
-                      params=params)
+                      params=params,
+                      queue_name=QUEUE_NAME)
 
         resp = {
             "result": "success",
             "file_name": n,
             "email": e,
             "query": q,
-            "api_version": API_VERSION
+            "api_version": DOWNLOAD_VERSION,
+            "source": source
         }
+        self.response.headers.add_header("Access-Control-Allow-Origin", "*")
+        self.response.headers['Content-Type'] = "application/json"
         self.response.write(json.dumps(resp))
-        # url = '/service/download?%s' % params
-        # self.redirect(url)

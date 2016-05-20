@@ -20,9 +20,10 @@ import logging
 from google.appengine.api import namespace_manager
 import webapp2
 
-from Querylogger.models import ResourceLogEntry, LogEntry
+from models import ResourceLogEntry, LogEntry
 
-LOGGER_VERSION = 'logger 2016-05-20T08:58:42+CEST'
+LAST_UPDATED = '2016-05-20T12:37:29+CEST'
+LOGGER_VERSION = 'logger 2016-05-20T12:37:29+CEST'
 
 IS_DEV = os.environ.get('SERVER_SOFTWARE', '').startswith('Development')
 
@@ -94,7 +95,7 @@ class QueryLogger(webapp2.RequestHandler):
         # Send response and finish call
 
         resp = {
-            "status": "success",
+            "result": "success",
             "message": "new log entry successfully added",
             "namespace": current_namespace,
             "logger_version": LOGGER_VERSION,

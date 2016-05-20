@@ -26,6 +26,7 @@ Get records from vnsearch.query
 Log in apitracker and return results
 """
 
+import os
 import json
 import logging
 from datetime import datetime
@@ -36,7 +37,15 @@ import webapp2
 import Search.search as vnsearch
 import util as vnutil
 
+LAST_UPDATED = '2016-05-20T12:37:29+CEST'
 SEARCH_VERSION = 'search 2016-05-19T18:27:16+CEST'
+
+IS_DEV = os.environ.get('SERVER_SOFTWARE', '').startswith('Development')
+
+if IS_DEV:
+    QUEUE_NAME = 'default'
+else:
+    QUEUE_NAME = 'apitracker'
 
 
 class SearchApi(webapp2.RequestHandler):
@@ -131,26 +140,29 @@ class SearchApi(webapp2.RequestHandler):
             taskqueue.add(
                 url='/apitracker',
                 payload=json.dumps(params),
-                # queue_name="apitracker"
+                queue_name=QUEUE_NAME
             )
-        else:
-            error = result[0].__class__.__name__
-            params = dict(
-                error=error,
-                query=q,
-                type='query',
-                latlon=self.cityLatLong
-            )
-            taskqueue.add(
-                url='/apitracker',
-                params=params,
-                # queue_name="apitracker"
-            )
-            self.response.clear()
-            message = 'Please try again. Error: %s' % error
-            self.response.set_status(500, message=message)
-            response = message
 
+        # # TODO: Update this section
+        # else:
+        #     error = result[0].__class__.__name__
+        #     params = dict(
+        #         error=error,
+        #         query=q,
+        #         type='query',
+        #         latlon=self.cityLatLong
+        #     )
+        #     taskqueue.add(
+        #         url='/apitracker',
+        #         params=params,
+        #         queue_name=QUEUE_NAME
+        #     )
+        #     self.response.clear()
+        #     message = 'Please try again. Error: %s' % error
+        #     self.response.set_status(500, message=message)
+        #     response = message
+
+        self.response.headers.add_header("Access-Control-Allow-Origin", "*")
         self.response.out.headers['Content-Type'] = 'application/json'
         self.response.headers['charset'] = 'utf-8'
         self.response.out.write(response)
