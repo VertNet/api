@@ -43,7 +43,7 @@ class LogEntry(ndb.Model):
     # Query result metadata
     error = ndb.StringProperty()
     count = ndb.IntegerProperty()
-    matching_records = ndb.IntegerProperty()
+    matching_records = ndb.StringProperty()
     response_records = ndb.IntegerProperty()
     results_by_resource = ndb.StructuredProperty(ResourceLogEntry,
                                                  repeated=True)

@@ -22,7 +22,7 @@ import webapp2
 
 from Querylogger.models import ResourceLogEntry, LogEntry
 
-LOGGER_VERSION = 'logger 2016-05-20T08:53:16+CEST'
+LOGGER_VERSION = 'logger 2016-05-20T08:58:42+CEST'
 
 IS_DEV = os.environ.get('SERVER_SOFTWARE', '').startswith('Development')
 
@@ -60,6 +60,10 @@ class QueryLogger(webapp2.RequestHandler):
         # Remove "results_by_resource" from parameters for independent process
 
         res_counts = params.pop('res_counts')
+
+        # Transform "matching_records" to <str> (for ">10000" entries)
+
+        params['matching_records'] = str(params['matching_records'])
 
         # Build and store LogEntry entity in default namespace
 
