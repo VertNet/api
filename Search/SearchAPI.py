@@ -20,6 +20,7 @@ Args:
   c: cursor
   l: limit, maximum number of records to return
   s: sorting information
+  o: origin, source of request (api, portal-web, ...)
 
 Get query parameters
 Get records from vnsearch.query
@@ -65,7 +66,7 @@ class SearchApi(webapp2.RequestHandler):
                                                               SEARCH_VERSION))
         # TODO: Add clause to catch missing 'q' error
         request = json.loads(self.request.get('q'))
-        q, c, limit, s = map(request.get, ['q', 'c', 'l', 's'])
+        q, c, limit, s, o = map(request.get, ['q', 'c', 'l', 's', 'o'])
 
         # Set the limit to 400 by default.  This value is based on the results
         # of substantial performance testing.
@@ -86,6 +87,10 @@ class SearchApi(webapp2.RequestHandler):
         sort = None
         if s:
             sort = s
+
+        request_source = "api"
+        if o:
+            request_source = o
 
         logging.info("Calling with SORT %s" % sort)
         result = vnsearch.query(q, limit, 'dwc', sort=sort, curs=curs)
@@ -132,7 +137,7 @@ class SearchApi(webapp2.RequestHandler):
             params = dict(
                 api_version=SEARCH_VERSION, count=len(recs),
                 country=self.country, latlon=self.cityLatLong,
-                matching_records=count, query=q, request_source='SearchAPI',
+                matching_records=count, query=q, request_source=request_source,
                 response_records=len(recs), res_counts=json.dumps(res_counts),
                 type=type, user_agent=self.user_agent
             )

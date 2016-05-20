@@ -24,7 +24,7 @@ Args:
   e: email to send notification to
   n: name of the download file
   c: counts only, return only number of records and not records themselves
-  s: source, indicates query origin - api, portal...
+  o: origin, indicates query origin - api, portal...
 """
 
 import os
@@ -69,7 +69,7 @@ class DownloadApi(webapp2.RequestHandler):
                      % (DOWNLOAD_VERSION, self.request))
         request = json.loads(self.request.get('q'))
         q, e, n, countonly, source = map(request.get,
-                                         ['q', 'e', 'n', 'c', 's'])
+                                         ['q', 'e', 'n', 'c', 'o'])
         keywords = q.split()
 
         # Apply default value to source parameter
